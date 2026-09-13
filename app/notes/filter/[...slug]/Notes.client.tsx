@@ -1,0 +1,53 @@
+"use client";
+
+import css from "./Notes.module.css";
+import Pagination from "../../../../components/Pagination/Pagination";
+import SearchBox from "../../../../components/SearchBox/SearchBox";
+import NoteList from "../../../../components/NoteList/NoteList";
+import { useState } from "react";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
+import { fetchNotes } from "../../../../lib/api";
+import { useDebounce } from "@/hooks/useDebounce";
+import Link from "next/link";
+
+type NotesClientProps = {
+  tag: string;
+};
+
+export default function NotesClient({ tag }: NotesClientProps) {
+  const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+
+  const debouncedSearch = useDebounce(search, 500);
+
+  const { data } = useQuery({
+    queryKey: ["notes", page, debouncedSearch, tag],
+    queryFn: () => fetchNotes(page, 10, debouncedSearch, tag),
+    placeholderData: keepPreviousData,
+  });
+
+  return (
+    <div className={css.app}>
+      <header className={css.toolbar}>
+        <SearchBox
+          value={search}
+          onChange={(value) => {
+            setSearch(value);
+            setPage(1);
+          }}
+        />
+        {data && data.totalPages > 1 && (
+          <Pagination
+            currentPage={page}
+            totalPages={data.totalPages}
+            onPageChange={setPage}
+          />
+        )}
+        <Link href="/notes/action/create" className={css.button}>
+          Create note +
+        </Link>
+      </header>
+      {data && data.notes.length > 0 && <NoteList notes={data.notes} />}
+    </div>
+  );
+}
