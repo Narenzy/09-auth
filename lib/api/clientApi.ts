@@ -1,10 +1,15 @@
 import type { Note, CreateNoteData } from "@/types/note";
 import { api } from "./api";
 import { cookies } from "next/headers";
+import { User } from "@/types/user";
 
 export interface NoteResponse {
   notes: Note[];
   totalPages: number;
+}
+interface RegisterRequest {
+  password: string;
+  email: string;
 }
 
 export async function fetchNotes(
@@ -47,5 +52,10 @@ export async function fetchNoteById(id: string): Promise<Note> {
       Cookie: cookieStore.toString(),
     },
   });
+  return res.data;
+}
+
+export async function register(data: RegisterRequest): Promise<User> {
+  const res = await api.post<User>("/auth/register", data);
   return res.data;
 }
