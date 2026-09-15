@@ -1,6 +1,6 @@
 "use client";
 
-import css from "../../../api/notes/filter/[...slug]/Notes.module.css";
+import css from "./Notes.module.css";
 import Pagination from "@/components/Pagination/Pagination";
 import SearchBox from "@/components/SearchBox/SearchBox";
 import NoteList from "@/components/NoteList/NoteList";
