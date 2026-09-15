@@ -1,6 +1,7 @@
-import type { Note, CreateNoteData } from "@/types/note";
+import type { Note } from "@/types/note";
 import { api } from "./api";
 import { cookies } from "next/headers";
+import type { User } from "@/types/user";
 
 export interface NoteResponse {
   notes: Note[];
@@ -13,6 +14,8 @@ export async function fetchNotes(
   search?: string,
   tag?: string,
 ): Promise<NoteResponse> {
+  const cookieStore = await cookies();
+
   const params: {
     page: number;
     perPage: number;
@@ -22,29 +25,56 @@ export async function fetchNotes(
     page,
     perPage,
   };
+
   if (search?.trim()) {
     params.search = search.trim();
   }
+
   if (tag?.trim()) {
     params.tag = tag.trim();
   }
+
   const res = await api.get<NoteResponse>("/notes", {
     params,
+    headers: {
+      Cookie: cookieStore.toString(),
+    },
   });
-  return res.data;
-}
 
-export async function createNote(newNote: CreateNoteData): Promise<Note> {
-  const res = await api.post<Note>("/notes", newNote);
-  return res.data;
-}
-
-export async function deleteNote(id: string): Promise<Note> {
-  const res = await api.delete<Note>(`/notes/${id}`);
   return res.data;
 }
 
 export async function fetchNoteById(id: string): Promise<Note> {
-  const res = await api.get<Note>(`/notes/${id}`);
+  const cookieStore = await cookies();
+
+  const res = await api.get<Note>(`/notes/${id}`, {
+    headers: {
+      Cookie: cookieStore.toString(),
+    },
+  });
+
+  return res.data;
+}
+
+export async function checkSession() {
+  const cookieStore = await cookies();
+
+  const res = await api.get("/auth/session", {
+    headers: {
+      Cookie: cookieStore.toString(),
+    },
+  });
+
+  return res;
+}
+export async function getMe(): Promise<User> {
+  const cookieStore = await cookies();
+
+  const res = await api.get<User>("/users/me", {
+    headers: {
+      Cookie: cookieStore.toString(),
+    },
+  });
+
   return res.data;
 }
