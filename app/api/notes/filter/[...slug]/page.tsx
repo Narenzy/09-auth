@@ -21,7 +21,6 @@ export async function generateMetadata({
   const tag = currentTag === "all" ? "all notes" : currentTag;
   const title = `Notes filtered by ${tag} | NoteHub`;
   const description = `Browse notes filtered by ${tag} in NoteHub.`;
-
   return {
     title,
     description,
@@ -45,6 +44,7 @@ export default async function NotesPage({ params }: NotesPageProps) {
   const queryClient = new QueryClient();
   const { slug } = await params;
   const currentTag = slug[0];
+
   const tag = currentTag === "all" ? "" : currentTag;
 
   await queryClient.prefetchQuery({

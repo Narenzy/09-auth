@@ -1,4 +1,4 @@
-import css from "./LayoutNotes.module.css";
+import css from "../../api/notes/filter/LayoutNotes.module.css";
 
 interface SideBarFilterProps {
   children: React.ReactNode;
@@ -10,11 +10,9 @@ export default function FilterSideBar({
   sidebar,
 }: SideBarFilterProps) {
   return (
-    <>
-      <section className={css.container}>
-        <aside className={css.sidebar}>{sidebar}</aside>
-        <div className={css.notesWrapper}>{children}</div>
-      </section>
-    </>
+    <section className={css.container}>
+      <aside className={css.sidebar}>{sidebar}</aside>
+      <div className={css.notesWrapper}>{children}</div>
+    </section>
   );
 }
