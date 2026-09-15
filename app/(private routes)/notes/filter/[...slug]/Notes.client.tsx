@@ -6,7 +6,7 @@ import SearchBox from "@/components/SearchBox/SearchBox";
 import NoteList from "@/components/NoteList/NoteList";
 import { useState } from "react";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
-import { fetchNotes } from "@/lib/api";
+import { fetchNotes } from "@/lib/api/clientApi";
 import { useDebounce } from "@/hooks/useDebounce";
 import Link from "next/link";
 

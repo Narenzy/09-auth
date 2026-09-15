@@ -4,36 +4,88 @@ import { cookies } from "next/headers";
 import { isAxiosError } from "axios";
 import { logErrorResponse } from "../_utils/utils";
 
+// export async function GET(request: NextRequest) {
+//   try {
+//     const cookieStore = await cookies();
+//     const search = request.nextUrl.searchParams.get("search") ?? "";
+//     const page = Number(request.nextUrl.searchParams.get("page") ?? 1);
+//     const rawTag = request.nextUrl.searchParams.get("tag") ?? "";
+//     const tag = rawTag === "All" ? "" : rawTag;
+
+//     const res = await api("/notes", {
+//       params: {
+//         ...(search !== "" && { search }),
+//         page,
+//         perPage: 12,
+//         ...(tag && { tag }),
+//       },
+//       headers: {
+//         Cookie: cookieStore.toString(),
+//       },
+//     });
+
+//     return NextResponse.json(res.data, { status: res.status });
+//   } catch (error) {
+//     if (isAxiosError(error)) {
+//       logErrorResponse(error.response?.data);
+//       return NextResponse.json(
+//         { error: error.message, response: error.response?.data },
+//         { status: error.status },
+//       );
+//     }
+//     logErrorResponse({ message: (error as Error).message });
+//     return NextResponse.json(
+//       { error: "Internal Server Error" },
+//       { status: 500 },
+//     );
+//   }
+// }
+
 export async function GET(request: NextRequest) {
   try {
     const cookieStore = await cookies();
+
     const search = request.nextUrl.searchParams.get("search") ?? "";
     const page = Number(request.nextUrl.searchParams.get("page") ?? 1);
-    const rawTag = request.nextUrl.searchParams.get("tag") ?? "";
-    const tag = rawTag === "All" ? "" : rawTag;
+    const perPage = Number(request.nextUrl.searchParams.get("perPage") ?? 12);
 
-    const res = await api("/notes", {
+    const rawTag = request.nextUrl.searchParams.get("tag") ?? "";
+    const tag = rawTag.toLowerCase() === "all" ? "" : rawTag;
+
+    const res = await api.get("/notes", {
       params: {
-        ...(search !== "" && { search }),
+        ...(search.trim() && { search: search.trim() }),
         page,
-        perPage: 12,
-        ...(tag && { tag }),
+        perPage,
+        ...(tag.trim() && { tag: tag.trim() }),
       },
       headers: {
         Cookie: cookieStore.toString(),
       },
     });
 
-    return NextResponse.json(res.data, { status: res.status });
+    return NextResponse.json(res.data, {
+      status: res.status,
+    });
   } catch (error) {
     if (isAxiosError(error)) {
       logErrorResponse(error.response?.data);
+
       return NextResponse.json(
-        { error: error.message, response: error.response?.data },
-        { status: error.status },
+        {
+          error: error.message,
+          response: error.response?.data,
+        },
+        {
+          status: error.response?.status ?? 500,
+        },
       );
     }
-    logErrorResponse({ message: (error as Error).message });
+
+    logErrorResponse({
+      message: (error as Error).message,
+    });
+
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 },

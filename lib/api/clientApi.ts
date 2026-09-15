@@ -85,3 +85,7 @@ export async function updateMe(data: UpdateUserRequest): Promise<User> {
   const res = await api.patch<User>("/users/me", data);
   return res.data;
 }
+export async function getMe(): Promise<User> {
+  const res = await api.get<User>("/users/me");
+  return res.data;
+}
