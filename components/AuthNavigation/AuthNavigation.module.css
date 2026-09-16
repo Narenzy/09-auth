@@ -6,20 +6,17 @@
 
 .logoutButton {
   background: transparent;
-  border: 1px solid white;
+  border: none;
   color: white;
-  padding: 0.3rem 0.6rem;
-  border-radius: 4px;
+  padding: 0;
   cursor: pointer;
-  font-size: 0.9rem;
-  transition:
-    background-color 0.3s ease,
-    color 0.3s ease;
+  font-size: 1rem;
+  font-weight: bold;
+  font-family: inherit;
 }
 
 .logoutButton:hover {
-  background-color: white;
-  color: #333;
+  color: #ddd;
 }
 
 .navigationItem {
