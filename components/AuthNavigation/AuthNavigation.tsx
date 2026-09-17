@@ -3,33 +3,18 @@
 import css from "./AuthNavigation.module.css";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
-import { getMe, logout } from "@/lib/api/clientApi";
+import { logout } from "@/lib/api/clientApi";
 import { useAuthStore } from "@/lib/store/authStore";
 
 export default function AuthNavigation() {
   const router = useRouter();
 
+  const user = useAuthStore((state) => state.user);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-
-  const setUser = useAuthStore((state) => state.setUser);
 
   const clearIsAuthenticated = useAuthStore(
     (state) => state.clearIsAuthenticated,
   );
-
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const user = await getMe();
-        setUser(user);
-      } catch {
-        clearIsAuthenticated();
-      }
-    };
-
-    checkAuth();
-  }, [setUser, clearIsAuthenticated]);
 
   const handleLogout = async () => {
     try {
@@ -46,6 +31,10 @@ export default function AuthNavigation() {
     <>
       {isAuthenticated ? (
         <>
+          <li className={css.navigationItem}>
+            <span className={css.userEmail}>{user?.email}</span>
+          </li>
+
           <li className={css.navigationItem}>
             <Link
               href="/profile"

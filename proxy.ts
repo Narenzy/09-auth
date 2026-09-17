@@ -33,31 +33,25 @@ export async function proxy(request: NextRequest) {
             ? setCookie
             : [setCookie];
 
+          const response = isPublicRoute
+            ? NextResponse.redirect(new URL("/", request.url))
+            : NextResponse.next();
+
           for (const cookieStr of cookieArray) {
             const parsed = parseSetCookie(cookieStr);
 
             if (parsed.value) {
-              cookieStore.set(parsed.name, parsed.value, parsed);
+              const { name, value, ...options } = parsed;
+
+              response.cookies.set(name, value, options);
             }
           }
 
-          if (isPublicRoute) {
-            return NextResponse.redirect(new URL("/profile", request.url), {
-              headers: {
-                Cookie: cookieStore.toString(),
-              },
-            });
-          }
-
-          if (isPrivateRoute) {
-            return NextResponse.next({
-              headers: {
-                Cookie: cookieStore.toString(),
-              },
-            });
-          }
+          return response;
         }
-      } catch {}
+      } catch (error) {
+        console.error("Session refresh failed:", error);
+      }
     }
 
     if (isPublicRoute) {
@@ -70,7 +64,7 @@ export async function proxy(request: NextRequest) {
   }
 
   if (isPublicRoute) {
-    return NextResponse.redirect(new URL("/profile", request.url));
+    return NextResponse.redirect(new URL("/", request.url));
   }
 
   if (isPrivateRoute) {

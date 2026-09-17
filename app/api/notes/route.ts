@@ -7,48 +7,33 @@ import { logErrorResponse } from "../_utils/utils";
 export async function GET(request: NextRequest) {
   try {
     const cookieStore = await cookies();
-
     const search = request.nextUrl.searchParams.get("search") ?? "";
     const page = Number(request.nextUrl.searchParams.get("page") ?? 1);
-    const perPage = Number(request.nextUrl.searchParams.get("perPage") ?? 12);
-
     const rawTag = request.nextUrl.searchParams.get("tag") ?? "";
-    const tag = rawTag.toLowerCase() === "all" ? "" : rawTag;
+    const tag = rawTag === "All" ? "" : rawTag;
 
-    const res = await api.get("/notes", {
+    const res = await api("/notes", {
       params: {
-        ...(search.trim() && { search: search.trim() }),
+        ...(search !== "" && { search }),
         page,
-        perPage,
-        ...(tag.trim() && { tag: tag.trim() }),
+        perPage: 12,
+        ...(tag && { tag }),
       },
       headers: {
         Cookie: cookieStore.toString(),
       },
     });
 
-    return NextResponse.json(res.data, {
-      status: res.status,
-    });
+    return NextResponse.json(res.data, { status: res.status });
   } catch (error) {
     if (isAxiosError(error)) {
       logErrorResponse(error.response?.data);
-
       return NextResponse.json(
-        {
-          error: error.message,
-          response: error.response?.data,
-        },
-        {
-          status: error.response?.status ?? 500,
-        },
+        { error: error.message, response: error.response?.data },
+        { status: error.status },
       );
     }
-
-    logErrorResponse({
-      message: (error as Error).message,
-    });
-
+    logErrorResponse({ message: (error as Error).message });
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 },
