@@ -89,3 +89,7 @@ export async function getMe(): Promise<User> {
   const res = await api.get<User>("/users/me");
   return res.data;
 }
+export async function checkSession() {
+  const res = await api.get("/auth/session");
+  return res.data;
+}
